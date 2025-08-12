@@ -1,15 +1,29 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, Clock, Star, Zap, Navigation } from 'lucide-react-native';
+import { MapPin, Clock, Star, Zap, Navigation, Link } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
-const { width } = Dimensions.get('window');
+const SIZES = {
+  screenWidth: Dimensions.get('window').width,
+  horizontalPadding: 24,
+  sectionSpacing: 20,
+};
+
+const COLORS = {
+  textPrimary: '#0F172A',
+  textSecondary: '#475569',
+  muted: '#94A3B8',
+  accent: '#0EA5A4',
+  glass: 'rgba(255,255,255,0.95)',
+  shadow: 'rgba(12, 17, 29, 0.08)',
+  cardBorder: '#E6EEF8',
+};
 
 // Mock data
 const mockUser = {
   name: 'John Doe',
-  role: 'passenger', // or 'driver'
+  role: 'passenger',
   rating: 4.8,
   totalTrips: 42,
 };
@@ -39,164 +53,183 @@ const mockMatches = [
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [activeTrip, setActiveTrip] = useState(null);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <LinearGradient colors={['#3B82F6', '#8B5CF6']} style={styles.header}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text style={styles.greeting}>Good morning,</Text>
-            <Text style={styles.userName}>{mockUser.name}</Text>
+    <LinearGradient
+      colors={['#E0F2FE', '#EDE9FE']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.profileSection}>
+            <View>
+              <Text style={styles.greeting}>Good morning,</Text>
+              <Text style={styles.userName}>{mockUser.name}</Text>
+            </View>
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <Star size={16} color={COLORS.accent} />
+                <Text style={styles.statText}>{mockUser.rating}</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Navigation size={16} color={COLORS.accent} />
+                <Text style={styles.statText}>{mockUser.totalTrips}</Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Star size={16} color="#FCD34D" />
-              <Text style={styles.statText}>{mockUser.rating}</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Navigation size={16} color="white" />
-              <Text style={styles.statText}>{mockUser.totalTrips}</Text>
-            </View>
-          </View>
-        </View>
-      </LinearGradient>
 
-      {/* Quick Actions */}
-      <View style={styles.quickActions}>
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => router.push('/search')}
-        >
-          <LinearGradient colors={['#10B981', '#059669']} style={styles.actionGradient}>
-            <MapPin size={24} color="white" />
-            <Text style={styles.actionText}>
-              {mockUser.role === 'passenger' ? 'Book Ride' : 'Offer Ride'}
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton}>
-          <LinearGradient colors={['#F59E0B', '#D97706']} style={styles.actionGradient}>
-            <Clock size={24} color="white" />
-            <Text style={styles.actionText}>Schedule</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
-      {/* Current Matches */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            {mockUser.role === 'passenger' ? 'Available Drivers' : 'Ride Requests'}
-          </Text>
-          <View style={styles.aiIndicator}>
-            <Zap size={16} color="#3B82F6" />
-            <Text style={styles.aiText}>AI Matched</Text>
-          </View>
-        </View>
-
-        {mockMatches.map((match) => (
-          <TouchableOpacity key={match.id} style={styles.matchCard}>
-            <View style={styles.matchHeader}>
-              <View>
-                <Text style={styles.matchName}>{match.driverName}</Text>
-                <View style={styles.matchDetails}>
-                  <Star size={14} color="#FCD34D" />
-                  <Text style={styles.matchRating}>{match.rating}</Text>
-                  <Text style={styles.matchSeparator}>•</Text>
-                  <Text style={styles.matchCar}>{match.carModel}</Text>
-                </View>
-              </View>
-              <View style={styles.confidenceContainer}>
-                <Text style={styles.confidenceText}>{match.confidence}%</Text>
-                <Text style={styles.confidenceLabel}>Match</Text>
-              </View>
-            </View>
-
-            <View style={styles.matchInfo}>
-              <View style={styles.infoItem}>
-                <Clock size={16} color="#6B7280" />
-                <Text style={styles.infoText}>{match.eta}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <MapPin size={16} color="#6B7280" />
-                <Text style={styles.infoText}>{match.distance}</Text>
-              </View>
-              <View style={styles.priceContainer}>
-                <Text style={styles.priceText}>{match.price}</Text>
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.requestButton}>
-              <Text style={styles.requestButtonText}>Request Ride</Text>
+          <View style={styles.quickActions}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push('/search')}
+            >
+              <LinearGradient 
+                colors={['#0EA5A4', '#0C8281']} 
+                style={styles.actionGradient}
+              >
+                <MapPin size={24} color="white" />
+                <Text style={styles.actionText}>
+                  {mockUser.role === 'passenger' ? 'Book Ride' : 'Offer Ride'}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
-          </TouchableOpacity>
-        ))}
-      </View>
 
-      {/* Recent Activity */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recent Activity</Text>
-        <View style={styles.activityCard}>
-          <View style={styles.activityIcon}>
-            <MapPin size={20} color="#10B981" />
+            <TouchableOpacity style={styles.actionButton}>
+              <LinearGradient 
+                colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
+                style={[styles.actionGradient, {
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  shadowColor: '#000',
+                  shadowOffset: {width: 0, height: 2},
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                }]}
+              >
+                <Clock size={24} color={COLORS.accent} />
+                <Text style={[styles.actionText, {color: COLORS.textPrimary}]}>Schedule</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
-          <View style={styles.activityContent}>
-            <Text style={styles.activityTitle}>Trip to Airport completed</Text>
-            <Text style={styles.activitySubtitle}>Yesterday, 2:30 PM • ₹180</Text>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                {mockUser.role === 'passenger' ? 'Available Drivers' : 'Ride Requests'}
+              </Text>
+              <View style={styles.aiIndicator}>
+                <Zap size={16} color={COLORS.accent} />
+                <Text style={styles.aiText}>AI Matched</Text>
+              </View>
+            </View>
+
+            {mockMatches.map((match) => (
+              <View key={match.id} style={styles.matchCard}>
+                <View style={styles.matchHeader}>
+                  <View>
+                    <Text style={styles.matchName}>{match.driverName}</Text>
+                    <View style={styles.matchDetails}>
+                      <Star size={14} color={COLORS.accent} />
+                      <Text style={styles.matchRating}>{match.rating}</Text>
+                      <Text style={styles.matchSeparator}>•</Text>
+                      <Text style={styles.matchCar}>{match.carModel}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.confidenceContainer}>
+                    <Text style={styles.confidenceText}>{match.confidence}%</Text>
+                    <Text style={styles.confidenceLabel}>Match</Text>
+                  </View>
+                </View>
+
+                <View style={styles.matchInfo}>
+                  <View style={styles.infoItem}>
+                    <Clock size={16} color={COLORS.muted} />
+                    <Text style={styles.infoText}>{match.eta}</Text>
+                  </View>
+                  <View style={styles.infoItem}>
+                    <MapPin size={16} color={COLORS.muted} />
+                    <Text style={styles.infoText}>{match.distance}</Text>
+                  </View>
+                  
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.priceText}>{match.price}</Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity style={styles.requestButton}>
+                  <Text style={styles.requestButtonText}>Request Ride</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
-        </View>
-      </View>
-    </ScrollView>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Recent Activity</Text>
+            <View style={styles.activityCard}>
+              <View style={styles.activityIcon}>
+                <MapPin size={20} color={COLORS.accent} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Trip to Airport completed</Text>
+                <Text style={styles.activitySubtitle}>Yesterday, 2:30 PM • ₹180</Text>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
-  header: {
-    paddingTop: 60,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+  safeArea: {
+    flex: 1,
   },
-  headerContent: {
+  profileSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 20,
+    paddingHorizontal: SIZES.horizontalPadding,
+    paddingBottom: SIZES.sectionSpacing,
   },
   greeting: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: COLORS.textSecondary,
   },
   userName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: '800',
+    color: COLORS.textPrimary,
   },
   statsContainer: {
     alignItems: 'flex-end',
+    gap: 8,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    backgroundColor: COLORS.glass,
+    padding: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   statText: {
-    color: 'white',
-    marginLeft: 4,
+    color: COLORS.textPrimary,
+    marginLeft: 6,
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   quickActions: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingVertical: 24,
+    paddingHorizontal: SIZES.horizontalPadding,
+    paddingVertical: SIZES.sectionSpacing,
     gap: 16,
   },
   actionButton: {
@@ -215,8 +248,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   section: {
-    paddingHorizontal: 24,
-    marginBottom: 24,
+    paddingHorizontal: SIZES.horizontalPadding,
+    marginBottom: SIZES.sectionSpacing,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -226,33 +259,32 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: '800',
+    color: COLORS.textPrimary,
   },
   aiIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EBF4FF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: COLORS.glass,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   aiText: {
     fontSize: 12,
-    color: '#3B82F6',
+    color: COLORS.accent,
     marginLeft: 4,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   matchCard: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.glass,
     borderRadius: 16,
     padding: 20,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   matchHeader: {
     flexDirection: 'row',
@@ -262,8 +294,8 @@ const styles = StyleSheet.create({
   },
   matchName: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: '700',
+    color: COLORS.textPrimary,
   },
   matchDetails: {
     flexDirection: 'row',
@@ -272,29 +304,34 @@ const styles = StyleSheet.create({
   },
   matchRating: {
     fontSize: 14,
-    color: '#374151',
+    color: COLORS.textSecondary,
     marginLeft: 4,
   },
   matchSeparator: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: COLORS.muted,
     marginHorizontal: 8,
   },
   matchCar: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
   },
   confidenceContainer: {
     alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   confidenceText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#10B981',
+    fontWeight: '700',
+    color: COLORS.accent,
   },
   confidenceLabel: {
     fontSize: 10,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     textTransform: 'uppercase',
   },
   matchInfo: {
@@ -309,22 +346,24 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     marginLeft: 4,
   },
   priceContainer: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: 'white',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   priceText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#10B981',
+    fontWeight: '700',
+    color: COLORS.accent,
   },
   requestButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: COLORS.accent,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
@@ -335,22 +374,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activityCard: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.glass,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   activityIcon: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: 'white',
     borderRadius: 10,
     padding: 8,
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   activityContent: {
     flex: 1,
@@ -358,11 +396,11 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: COLORS.textPrimary,
   },
   activitySubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
-}); 
+});

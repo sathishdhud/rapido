@@ -6,10 +6,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Alert,
+  Pressable,
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Stack, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -37,10 +39,7 @@ const COLORS = {
 function BrandHeader() {
   return (
     <View style={bhStyles.container}>
-      <View style={bhStyles.logoBox}>
-        <Text style={bhStyles.logoLetter}>R</Text>
-      </View>
-      <Text style={bhStyles.title}>RideSync</Text>
+    
     </View>
   );
 }
@@ -94,7 +93,7 @@ const avStyles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
+    borderWidth: 6,
     borderColor: '#fff',
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 6 },
@@ -113,9 +112,11 @@ function FloatingCard({ avatarBg, icon, title, description, features, onPress })
         <AvatarIcon bgColor={avatarBg}>{icon}</AvatarIcon>
       </View>
 
-      <TouchableOpacity onPress={onPress} activeOpacity={0.92}>
+      <View>
         <LinearGradient
-          colors={['#ffffff', '#f9fafe']}
+          colors={['#ffffff', '#f8f9ff', '#f3f6fe']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
           style={fcStyles.card}
         >
           <Text style={fcStyles.title}>{title}</Text>
@@ -130,11 +131,15 @@ function FloatingCard({ avatarBg, icon, title, description, features, onPress })
             ))}
           </View>
 
-          <View style={fcStyles.cta}>
+          <TouchableOpacity 
+            onPress={onPress}
+            style={fcStyles.cta}
+            activeOpacity={0.7}
+          >
             <Text style={fcStyles.ctaText}>Continue as {title}</Text>
-          </View>
+          </TouchableOpacity>
         </LinearGradient>
-      </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -142,7 +147,7 @@ function FloatingCard({ avatarBg, icon, title, description, features, onPress })
 const fcStyles = StyleSheet.create({
   outer: {
     alignItems: 'center',
-    marginVertical: 16,
+    marginVertical: 32,
   },
   avatarAbsolute: {
     position: 'absolute',
@@ -217,58 +222,58 @@ const fcStyles = StyleSheet.create({
   },
 });
 
-export default function RoleSelectionScreen({ navigation, onSelectRole }) {
+export default function RoleSelectionScreen() {
+  const router = useRouter();
+
   function handleSelect(role) {
-    if (typeof onSelectRole === 'function') {
-      onSelectRole(role);
-      return;
-    }
-    if (navigation?.replace) {
-      navigation.replace('MainTabs', { initialRole: role });
-      return;
-    }
-    Alert.alert('Role selected', `You selected: ${role}`);
-   
+    router.push({
+      pathname: "/(tabs)",
+      params: { role }
+    });
   }
 
   return (
-    <LinearGradient
-      colors={['#E0F2FE', '#EDE9FE']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={styles.container}>
-        <BrandHeader />
-        <Text style={styles.title}>Choose Your Role</Text>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar style="auto" />
+      <LinearGradient
+        colors={['#E0F2FE', '#EDE9FE']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ flex: 1 }}
+      >
+        <SafeAreaView style={styles.container}>
+          <BrandHeader />
+          <Text style={styles.title}>Choose Your Role</Text>
 
-        <FloatingCard
-          avatarBg={COLORS.driver}
-          icon={<MaterialCommunityIcons name="steering" size={36} color="#FFFFFF" />}
-          title="Driver"
-          description="Offer rides, set your schedule, and earn money."
-          features={[
-            'Set your route & schedule',
-            'Get matched with passengers',
-            'Earn from every trip',
-          ]}
-          onPress={() => handleSelect('driver')}
-        />
+          <FloatingCard
+            avatarBg={COLORS.driver}
+            icon={<MaterialCommunityIcons name="steering" size={36} color="#FFFFFF" />}
+            title="Driver"
+            description="Offer rides, set your schedule, and earn money."
+            features={[
+              'Set your route & schedule',
+              'Get matched with passengers',
+              'Earn from every trip',
+            ]}
+            onPress={() => handleSelect('driver')}
+          />
 
-        <FloatingCard
-          avatarBg={COLORS.passenger}
-          icon={<Ionicons name="people" size={36} color="#FFFFFF" />}
-          title="Passenger"
-          description="Find rides and travel safely with verified drivers."
-          features={[
-            'Request rides anywhere',
-            'AI-powered matching',
-            'Safe & affordable travel',
-          ]}
-          onPress={() => handleSelect('passenger')}
-        />
-      </SafeAreaView>
-    </LinearGradient>
+          <FloatingCard
+            avatarBg={COLORS.passenger}
+            icon={<Ionicons name="people" size={36} color="#FFFFFF" />}
+            title="Passenger"
+            description="Find rides and travel safely with verified drivers."
+            features={[
+              'Request rides anywhere',
+              'AI-powered matching',
+              'Safe & affordable travel',
+            ]}
+            onPress={() => handleSelect('passenger')}
+          />
+        </SafeAreaView>
+      </LinearGradient>
+    </>
   );
 }
 

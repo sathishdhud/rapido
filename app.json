@@ -4,7 +4,6 @@
     "slug": "bolt-expo-nativewind",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,12 +12,36 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "output": "single"
     },
-    "plugins": ["expo-router", "expo-font", "expo-web-browser"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
+    ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00576d0f-a888-4038-aafd-42df7a384148"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/00576d0f-a888-4038-aafd-42df7a384148"
+    },
+    "android": {
+      "package": "com.sathishdhud.boltexponativewind",
+      "versionCode": 1
+    }
+  },
+  "expo.doctor": {
+    "reactNativeDirectoryCheck": {
+      "listUnknownPackages": false
     }
   }
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { MapPin, Clock, Star, Filter, Calendar, Navigation } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Mock trip data
 const mockTrips = [
@@ -33,7 +34,7 @@ const mockTrips = [
   {
     id: '3',
     type: 'driver',
-    passengerName: 'Emma Davis',
+    passengerName: 'Emma Davis', 
     from: 'Downtown',
     to: 'University',
     date: '2025-01-13',
@@ -92,7 +93,12 @@ export default function HistoryScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#E0F2FE', '#EDE9FE']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={{ flex: 1 }}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Trip History</Text>
@@ -132,7 +138,13 @@ export default function HistoryScreen() {
       {/* Trip List */}
       <ScrollView style={styles.tripList} showsVerticalScrollIndicator={false}>
         {filteredTrips.map((trip) => (
-          <View key={trip.id} style={styles.tripCard}>
+          <LinearGradient
+            key={trip.id}
+            colors={['#ffffff', '#f8f9ff', '#f3f6fe']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={[styles.tripCard]}
+          >
             {/* Trip Header */}
             <View style={styles.tripHeader}>
               <View style={styles.tripTypeContainer}>
@@ -197,17 +209,16 @@ export default function HistoryScreen() {
                 </View>
               )}
             </View>
-          </View>
+          </LinearGradient>
         ))}
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   header: {
     paddingTop: 60,
@@ -256,15 +267,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   tripCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    marginHorizontal: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(230, 238, 248, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    shadowColor: '#0C111D',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   tripHeader: {
     flexDirection: 'row',
