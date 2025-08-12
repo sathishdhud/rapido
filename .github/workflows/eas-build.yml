@@ -1,40 +1,51 @@
-name: EAS Build APK
+name: Build Expo APK
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # or your branch name
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install yarn
+      run: npm install -g yarn
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
 
-      - name: Login to Expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --token $EXPO_TOKEN
+    - name: Login to Expo CLI
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}  # Set your Expo token in repo secrets
+      run: |
+        npm install -g expo-cli
+        expo login --token $EXPO_TOKEN
 
-      - name: Build APK
-        run: eas build --platform android --profile production --non-interactive
+    - name: Build Android APK
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      run: expo build:android --type apk --non-interactive
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: apk-artifacts
-          path: ./build
+    - name: Download APK artifact from Expo
+      run: |
+        # Expo outputs build status URL, you can poll or fetch APK URL from there
+        # Here assuming the APK is downloaded manually or you have a script to fetch it
+        echo "You need to add script here to download APK from Expo build URL"
+
+    # Example: Upload local APK file (replace path if needed)
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app.apk
+        path: android/app/build/outputs/apk/release/app-release.apk  # Adjust path if you have local build
+
