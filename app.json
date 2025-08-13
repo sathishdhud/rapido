@@ -1,42 +1,45 @@
-expo:
-  name: bolt-expo-nativewind
-  slug: bolt-expo-nativewind
-  version: 1.0.0
-  orientation: portrait
-  scheme: myapp
-  userInterfaceStyle: automatic
-  newArchEnabled: true
-
-  ios:
-    supportsTablet: true
-
-  web:
-    bundler: metro
-    output: single
-
-  plugins:
-    - expo-router
-    - expo-font
-    - expo-web-browser
-
-  experiments:
-    typedRoutes: true
-
-  extra:
-    router: {}
-    eas:
-      projectId: "00576d0f-a888-4038-aafd-42df7a384148"
-
-  runtimeVersion:
-    policy: appVersion
-
-  updates:
-    url: "https://u.expo.dev/00576d0f-a888-4038-aafd-42df7a384148"
-
-  android:
-    package: com.sathishdhud.boltexponativewind
-    versionCode: 1
-
-expo.doctor:
-  reactNativeDirectoryCheck:
-    listUnknownPackages: false
+{
+  "expo": {
+    "name": "bolt-expo-nativewind",
+    "slug": "bolt-expo-nativewind",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00576d0f-a888-4038-aafd-42df7a384148"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/00576d0f-a888-4038-aafd-42df7a384148"
+    },
+    "android": {
+      "package": "com.sathishdhud.boltexponativewind",
+      "versionCode": 1
+    }
+  },
+  "expo.doctor": {
+    "reactNativeDirectoryCheck": {
+      "listUnknownPackages": false
+    }
+  }
+}
