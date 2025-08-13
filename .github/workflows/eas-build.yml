@@ -21,13 +21,16 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn
 
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Expo Login
+      - name: EAS Login
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: expo login --token $EXPO_TOKEN
+        run: eas login --token $EXPO_TOKEN
 
       - name: Run Expo prebuild (optional)
         run: yarn expo prebuild
@@ -47,4 +50,3 @@ jobs:
         with:
           name: android-apk
           path: ./builds/*.apk  # Adjust path to your built APK location
-
