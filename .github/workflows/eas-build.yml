@@ -10,43 +10,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      # 2. Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
+      # 3. Install Yarn (optional if your project uses yarn)
       - name: Install Yarn
         run: npm install -g yarn
 
+      # 4. Install EAS CLI
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      # 5. Install project dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: EAS Login
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --token $EXPO_TOKEN
-
-      - name: Run Expo prebuild (optional)
+      # 6. (Optional) Run prebuild if you are in bare workflow
+      - name: Expo prebuild
         run: yarn expo prebuild
 
+      # 7. Build Android APK with EAS
       - name: Build Android APK with EAS
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --non-interactive
+        run: eas build --platform android --non-interactive --profile preview
 
-      - name: Download build artifact URL
+      # 8. Get the latest build URL from Expo
+      - name: Get APK download URL
         id: get-url
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           echo "build_url=$(eas build:list --limit 1 --status finished --platform android --json | jq -r '.[0].artifacts.buildUrl')" >> $GITHUB_OUTPUT
 
+      # 9. Download the APK from Expo
+      - name: Download APK
+        run: |
+          curl -L "${{ steps.get-url.outputs.build_url }}" -o app.apk
+
+      # 10. Upload APK to GitHub Actions artifacts
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: ./builds/*.apk  # Adjust path to your built APK location
+          path: app.apk
