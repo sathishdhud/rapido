@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Expo Android APK (Managed Workflow)
 
 on:
   push:
@@ -14,39 +14,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js (needed for Expo/React Native JS part)
+      # 2. Setup Node.js 16 (expo-cli requires Node <=16)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 16
 
       # 3. Install Yarn
       - name: Install Yarn
         run: npm install -g yarn
 
-      # 4. Install dependencies
+      # 4. Install Expo CLI
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      # 5. Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 5. Setup JDK for Android build
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
+      # 6. Build APK with Expo Classic
+      - name: Build APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: expo build:android -t apk --non-interactive
 
-      # 6. Setup Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      # 7. Build APK with Gradle
-      - name: Build APK with Gradle
-        working-directory: android
-        run: ./gradlew assembleRelease
-
-      # 8. Upload APK artifact
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+      # 7. Get APK URL (you must download manually from Expo)
+      - name: Get APK URL
+        run: expo url:apk --non-interactive
