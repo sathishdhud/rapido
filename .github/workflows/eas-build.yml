@@ -1,4 +1,4 @@
-name: Build Expo Android APK
+name: Build Android APK
 
 on:
   push:
@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
+      # 2. Setup Node.js (needed for Expo/React Native JS part)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -24,29 +24,29 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn
 
-      # 4. Install Expo CLI
-      - name: Install Expo CLI
-        run: npm install -g expo-cli
-
-      # 5. Install dependencies
+      # 4. Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 6. Build APK with Expo Classic
-      - name: Build APK
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: expo build:android -t apk --non-interactive
+      # 5. Setup JDK for Android build
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
 
-      # 7. Wait & download artifact
-      - name: Download APK
-        run: |
-          mkdir -p build
-          curl -L "$(expo url:apk --non-interactive)" -o build/app.apk
+      # 6. Setup Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      # 8. Upload to GitHub Actions artifacts
-      - name: Upload APK artifact
+      # 7. Build APK with Gradle
+      - name: Build APK with Gradle
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      # 8. Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: build/app.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
