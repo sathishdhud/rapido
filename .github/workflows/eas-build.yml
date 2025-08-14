@@ -14,50 +14,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js 20
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      # 3. Install Yarn (optional if your project uses yarn)
+      # 3. Install Yarn
       - name: Install Yarn
         run: npm install -g yarn
 
-      # 4. Install EAS CLI
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      # 4. Install Expo CLI
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
 
-      # 5. Install project dependencies
+      # 5. Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 6. (Optional) Run prebuild if you are in bare workflow
-      - name: Expo prebuild
-        run: yarn expo prebuild
-
-      # 7. Build Android APK with EAS
-      - name: Build Android APK with EAS
+      # 6. Build APK with Expo Classic
+      - name: Build APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --non-interactive --profile preview
+        run: expo build:android -t apk --non-interactive
 
-      # 8. Get the latest build URL from Expo
-      - name: Get APK download URL
-        id: get-url
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          echo "build_url=$(eas build:list --limit 1 --status finished --platform android --json | jq -r '.[0].artifacts.buildUrl')" >> $GITHUB_OUTPUT
-
-      # 9. Download the APK from Expo
+      # 7. Wait & download artifact
       - name: Download APK
         run: |
-          curl -L "${{ steps.get-url.outputs.build_url }}" -o app.apk
+          mkdir -p build
+          curl -L "$(expo url:apk --non-interactive)" -o build/app.apk
 
-      # 10. Upload APK to GitHub Actions artifacts
+      # 8. Upload to GitHub Actions artifacts
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: app.apk
+          path: build/app.apk
