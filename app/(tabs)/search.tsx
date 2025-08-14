@@ -1,30 +1,30 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Dimensions, SafeAreaView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MapPin, Calendar, Clock, Users, Navigation, Filter } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SIZES = {
   screenWidth: SCREEN_WIDTH,
+  screenHeight: SCREEN_HEIGHT,
   cardMaxWidth: 760,
-  horizontalPadding: 24,
-  sectionSpacing: 20,
+  horizontalPadding: 16,
+  sectionSpacing: 16,
+  safeAreaTop: Platform.OS === 'ios' ? 44 : 24,
 };
 
 const COLORS = {
-  cardBorder: '#E6EEF8',
+  accent: '#0EA5A4',
   textPrimary: '#0F172A',
   textSecondary: '#475569',
   muted: '#94A3B8',
-  bullet: '#DDE9FB',
-  driver: '#2563EB',
-  passenger: '#7C3AED',
-  glass: 'rgba(255,255,255,0.95)',
-  shadow: 'rgba(12, 17, 29, 0.08)',
-  accent: '#0EA5A4',
-  background: '#F9FAFB',
+  cardBorder: '#E6EEF8',
+  glass: 'rgba(255,255,255,0.98)',
+  shadow: 'rgba(12, 17, 29, 0.12)',
+  gradient: ['#E0F2FE', '#F0F9FF', '#F8FAFC'],
 };
 
 export default function SearchScreen() {
@@ -38,187 +38,213 @@ export default function SearchScreen() {
   });
 
   const handleSearch = () => {
-    console.log('Searching for rides...', formData);
+    router.push('/search-results');
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <StatusBar style="light" />
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <LinearGradient 
-          colors={[COLORS.driver, COLORS.passenger]} 
-          style={styles.header}
+    <SafeAreaView style={styles.safeArea}>
+      <LinearGradient 
+        colors={COLORS.gradient}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      >
+        <StatusBar style="dark" />
+        <ScrollView 
+          style={styles.scrollView} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          bounces={false}
+          overScrollMode="never"
         >
-          <Text style={styles.headerTitle}>
-            {tripType === 'passenger' ? 'Find a Ride' : 'Offer a Ride'}
-          </Text>
-          <Text style={styles.headerSubtitle}>
-            AI will find the perfect match for you
-          </Text>
-        </LinearGradient>
-
-        <View style={styles.content}>
-          <View style={styles.toggleContainer}>
-            <TouchableOpacity
-              style={[styles.toggleButton, tripType === 'passenger' && styles.toggleActive]}
-              onPress={() => setTripType('passenger')}
-            >
-              <Users size={20} color={tripType === 'passenger' ? COLORS.glass : COLORS.muted} />
-              <Text style={[styles.toggleText, tripType === 'passenger' && styles.toggleTextActive]}>
-                Passenger
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.toggleButton, tripType === 'driver' && styles.toggleActive]}
-              onPress={() => setTripType('driver')}
-            >
-              <Navigation size={20} color={tripType === 'driver' ? COLORS.glass : COLORS.muted} />
-              <Text style={[styles.toggleText, tripType === 'driver' && styles.toggleTextActive]}>
-                Driver
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>
+              {tripType === 'passenger' ? 'Find a Ride' : 'Offer a Ride'}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              AI will find the perfect match for you
+            </Text>
           </View>
 
-          <View style={styles.card}>
-            <View style={styles.inputGroup}>
-              <View style={styles.inputIcon}>
-                <View style={styles.pickupDot} />
+          <View style={styles.content}>
+            <View style={styles.toggleContainer}>
+              <TouchableOpacity
+                style={[styles.toggleButton, tripType === 'passenger' && styles.toggleActive]}
+                onPress={() => setTripType('passenger')}
+              >
+                <Users size={20} color={tripType === 'passenger' ? COLORS.glass : COLORS.muted} />
+                <Text style={[styles.toggleText, tripType === 'passenger' && styles.toggleTextActive]}>
+                  Passenger
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.toggleButton, tripType === 'driver' && styles.toggleActive]}
+                onPress={() => setTripType('driver')}
+              >
+                <Navigation size={20} color={tripType === 'driver' ? COLORS.glass : COLORS.muted} />
+                <Text style={[styles.toggleText, tripType === 'driver' && styles.toggleTextActive]}>
+                  Driver
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.inputGroup}>
+                <View style={styles.inputIcon}>
+                  <View style={styles.pickupDot} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Pickup location"
+                  value={formData.pickup}
+                  onChangeText={(text) => setFormData({ ...formData, pickup: text })}
+                  placeholderTextColor={COLORS.muted}
+                />
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Pickup location"
-                value={formData.pickup}
-                onChangeText={(text) => setFormData({ ...formData, pickup: text })}
-                placeholderTextColor={COLORS.muted}
-              />
-            </View>
 
-            <View style={styles.routeLine} />
+              <View style={styles.routeLine} />
 
-            <View style={styles.inputGroup}>
-              <View style={styles.inputIcon}>
-                <MapPin size={16} color={COLORS.passenger} />
+              <View style={styles.inputGroup}>
+                <View style={styles.inputIcon}>
+                  <MapPin size={16} color={COLORS.accent} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Destination"
+                  value={formData.destination}
+                  onChangeText={(text) => setFormData({ ...formData, destination: text })}
+                  placeholderTextColor={COLORS.muted}
+                />
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Destination"
-                value={formData.destination}
-                onChangeText={(text) => setFormData({ ...formData, destination: text })}
-                placeholderTextColor={COLORS.muted}
-              />
             </View>
-          </View>
 
-          <View style={styles.dateTimeContainer}>
-            <View style={styles.dateTimeInput}>
-              <Calendar size={16} color={COLORS.muted} />
-              <TextInput
-                style={styles.dateTimeText}
-                placeholder="Date"
-                value={formData.date}
-                onChangeText={(text) => setFormData({ ...formData, date: text })}
-                placeholderTextColor={COLORS.muted}
-              />
+            <View style={styles.dateTimeContainer}>
+              <View style={styles.dateTimeInput}>
+                <Calendar size={16} color={COLORS.muted} />
+                <TextInput
+                  style={styles.dateTimeText}
+                  placeholder="Date"
+                  value={formData.date}
+                  onChangeText={(text) => setFormData({ ...formData, date: text })}
+                  placeholderTextColor={COLORS.muted}
+                />
+              </View>
+              <View style={styles.dateTimeInput}>
+                <Clock size={16} color={COLORS.muted} />
+                <TextInput
+                  style={styles.dateTimeText}
+                  placeholder="Time"
+                  value={formData.time}
+                  onChangeText={(text) => setFormData({ ...formData, time: text })}
+                  placeholderTextColor={COLORS.muted}
+                />
+              </View>
             </View>
-            <View style={styles.dateTimeInput}>
-              <Clock size={16} color={COLORS.muted} />
-              <TextInput
-                style={styles.dateTimeText}
-                placeholder="Time"
-                value={formData.time}
-                onChangeText={(text) => setFormData({ ...formData, time: text })}
-                placeholderTextColor={COLORS.muted}
-              />
-            </View>
-          </View>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Number of seats</Text>
-            <View style={styles.seatsSelector}>
-              {['1', '2', '3', '4'].map((seat) => (
-                <TouchableOpacity
-                  key={seat}
-                  style={[
-                    styles.seatButton,
-                    formData.seats === seat && styles.seatButtonActive,
-                  ]}
-                  onPress={() => setFormData({ ...formData, seats: seat })}
-                >
-                  <Text
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Number of seats</Text>
+              <View style={styles.seatsSelector}>
+                {['1', '2', '3', '4'].map((seat) => (
+                  <TouchableOpacity
+                    key={seat}
                     style={[
-                      styles.seatButtonText,
-                      formData.seats === seat && styles.seatButtonTextActive,
+                      styles.seatButton,
+                      formData.seats === seat && styles.seatButtonActive,
                     ]}
+                    onPress={() => setFormData({ ...formData, seats: seat })}
                   >
-                    {seat}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.seatButtonText,
+                        formData.seats === seat && styles.seatButtonTextActive,
+                      ]}
+                    >
+                      {seat}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              style={styles.searchButton} 
+              onPress={handleSearch}
+              activeOpacity={0.9}
+            >
+              <LinearGradient 
+                colors={[COLORS.accent, COLORS.accent]} 
+                style={styles.searchGradient}
+              >
+                <Text style={styles.searchButtonText}>
+                  {tripType === 'passenger' ? 'Find Drivers' : 'Post Your Ride'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <View style={styles.recentSection}>
+              <View style={styles.recentHeader}>
+                <Text style={styles.recentTitle}>Recent Searches</Text>
+                <TouchableOpacity>
+                  <Filter size={20} color={COLORS.muted} />
+                </TouchableOpacity>
+              </View>
+              
+              {[
+                { from: 'Home', to: 'Office', time: 'Today, 9:00 AM' },
+                { from: 'Mall', to: 'Airport', time: 'Yesterday, 5:30 PM' },
+              ].map((item, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.recentItem}
+                  activeOpacity={0.9}
+                >
+                  <View style={styles.recentRoute}>
+                    <Text style={styles.recentText}>{item.from}</Text>
+                    <View style={styles.recentArrow}>
+                      <View style={styles.arrowLine} />
+                      <Navigation size={12} color={COLORS.muted} />
+                    </View>
+                    <Text style={styles.recentText}>{item.to}</Text>
+                  </View>
+                  <Text style={styles.recentTime}>{item.time}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
-
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <LinearGradient 
-              colors={[COLORS.driver, COLORS.passenger]} 
-              style={styles.searchGradient}
-            >
-              <Text style={styles.searchButtonText}>
-                {tripType === 'passenger' ? 'Find Drivers' : 'Post Your Ride'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <View style={styles.recentSection}>
-            <View style={styles.recentHeader}>
-              <Text style={styles.recentTitle}>Recent Searches</Text>
-              <TouchableOpacity>
-                <Filter size={20} color={COLORS.muted} />
-              </TouchableOpacity>
-            </View>
-            
-            {[
-              { from: 'Home', to: 'Office', time: 'Today, 9:00 AM' },
-              { from: 'Mall', to: 'Airport', time: 'Yesterday, 5:30 PM' },
-            ].map((item, index) => (
-              <TouchableOpacity key={index} style={styles.recentItem}>
-                <View style={styles.recentRoute}>
-                  <Text style={styles.recentText}>{item.from}</Text>
-                  <View style={styles.recentArrow}>
-                    <View style={styles.arrowLine} />
-                    <Navigation size={12} color={COLORS.muted} />
-                  </View>
-                  <Text style={styles.recentText}>{item.to}</Text>
-                </View>
-                <Text style={styles.recentTime}>{item.time}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </LinearGradient>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.gradient[0],
+  },
   container: {
     flex: 1,
   },
-  header: {
-    paddingTop: 20,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: SIZES.sectionSpacing * 2,
+  },
+  headerContent: {
+    paddingTop: SIZES.safeAreaTop,
     paddingHorizontal: SIZES.horizontalPadding,
-    paddingBottom: 32,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    paddingBottom: SIZES.sectionSpacing,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: COLORS.glass,
+    color: COLORS.textPrimary,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: COLORS.textSecondary,
   },
   content: {
     paddingHorizontal: SIZES.horizontalPadding,
@@ -226,9 +252,11 @@ const styles = StyleSheet.create({
   toggleContainer: {
     flexDirection: 'row',
     marginVertical: SIZES.sectionSpacing,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: COLORS.glass,
     borderRadius: 12,
     padding: 4,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   toggleButton: {
     flex: 1,
@@ -240,7 +268,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   toggleActive: {
-    backgroundColor: COLORS.driver,
+    backgroundColor: COLORS.accent,
   },
   toggleText: {
     fontSize: 16,
@@ -258,10 +286,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 24,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   cardTitle: {
     fontSize: 16,
@@ -282,7 +310,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.driver,
+    backgroundColor: COLORS.accent,
   },
   input: {
     flex: 1,
@@ -293,7 +321,7 @@ const styles = StyleSheet.create({
   routeLine: {
     width: 2,
     height: 24,
-    backgroundColor: COLORS.bullet,
+    backgroundColor: COLORS.cardBorder,
     marginLeft: 11,
     marginVertical: 8,
   },
@@ -328,13 +356,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.glass,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
   },
   seatButtonActive: {
-    backgroundColor: COLORS.driver,
-    borderColor: COLORS.driver,
+    backgroundColor: COLORS.accent,
+    borderColor: COLORS.accent,
   },
   seatButtonText: {
     fontSize: 16,
@@ -359,7 +387,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   recentSection: {
-    paddingBottom: 100,
+    paddingBottom: SIZES.sectionSpacing * 2,
   },
   recentHeader: {
     flexDirection: 'row',
@@ -398,7 +426,7 @@ const styles = StyleSheet.create({
   arrowLine: {
     width: 20,
     height: 1,
-    backgroundColor: COLORS.bullet,
+    backgroundColor: COLORS.cardBorder,
     marginRight: 4,
   },
   recentTime: {

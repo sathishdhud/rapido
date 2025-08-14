@@ -1,23 +1,30 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Dimensions, SafeAreaView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, Clock, Star, Zap, Navigation, Link } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { MapPin, Clock, Star, Zap, Navigation, Shield } from 'lucide-react-native';
+import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SIZES = {
-  screenWidth: Dimensions.get('window').width,
-  horizontalPadding: 24,
-  sectionSpacing: 20,
+  screenWidth: SCREEN_WIDTH,
+  screenHeight: SCREEN_HEIGHT,
+  cardMaxWidth: 760,
+  horizontalPadding: 16,
+  sectionSpacing: 16,
+  safeAreaTop: Platform.OS === 'ios' ? 44 : 24,
 };
 
 const COLORS = {
-  textPrimary: '#0F172A',
-  textSecondary: '#475569',
-  muted: '#94A3B8',
-  accent: '#0EA5A4',
-  glass: 'rgba(255,255,255,0.95)',
+  accent: '#3B82F6',
+  textPrimary: '#1F2937',
+  textSecondary: '#6B7280',
+  muted: '#9CA3AF',
+  cardBorder: 'rgba(230, 238, 248, 0.8)',
+  glass: 'rgba(255, 255, 255, 0.95)',
   shadow: 'rgba(12, 17, 29, 0.08)',
-  cardBorder: '#E6EEF8',
+  gradient: ['#E0F2FE', '#EDE9FE'],
 };
 
 // Mock data
@@ -52,66 +59,90 @@ const mockMatches = [
 ];
 
 export default function HomeScreen() {
-  const router = useRouter();
+  const [locationSharing, setLocationSharing] = useState(true);
 
   return (
-    <LinearGradient
-      colors={['#E0F2FE', '#EDE9FE']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.safeArea}>
+      <LinearGradient 
+        colors={COLORS.gradient}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      >
+        <StatusBar style="dark" />
+        <ScrollView 
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          bounces={false}
+          overScrollMode="never"
+        >
           <View style={styles.profileSection}>
             <View>
               <Text style={styles.greeting}>Good morning,</Text>
               <Text style={styles.userName}>{mockUser.name}</Text>
             </View>
             <View style={styles.statsContainer}>
-              <View style={styles.statItem}>
+              <LinearGradient
+                colors={['#ffffff', '#f8f9ff']}
+                style={styles.statCard}
+              >
                 <Star size={16} color={COLORS.accent} />
-                <Text style={styles.statText}>{mockUser.rating}</Text>
-              </View>
-              <View style={styles.statItem}>
+                <View style={styles.statTextContainer}>
+                  <Text style={styles.statValue}>{mockUser.rating}</Text>
+                  <Text style={styles.statLabel}>Rating</Text>
+                </View>
+              </LinearGradient>
+              <LinearGradient
+                colors={['#ffffff', '#f8f9ff']}
+                style={styles.statCard}
+              >
                 <Navigation size={16} color={COLORS.accent} />
-                <Text style={styles.statText}>{mockUser.totalTrips}</Text>
-              </View>
+                <View style={styles.statTextContainer}>
+                  <Text style={styles.statValue}>{mockUser.totalTrips}</Text>
+                  <Text style={styles.statLabel}>Trips</Text>
+                </View>
+              </LinearGradient>
             </View>
           </View>
 
           <View style={styles.quickActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => router.push('/search')}
+            <LinearGradient
+              colors={['#ffffff', '#f8f9ff']}
+              style={styles.menuItem}
             >
-              <LinearGradient 
-                colors={['#0EA5A4', '#0C8281']} 
-                style={styles.actionGradient}
+              <TouchableOpacity
+                onPress={() => router.push('/search')}
+                activeOpacity={0.9}
+                style={styles.menuTouchable}
               >
-                <MapPin size={24} color="white" />
-                <Text style={styles.actionText}>
-                  {mockUser.role === 'passenger' ? 'Book Ride' : 'Offer Ride'}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <View style={styles.menuLeft}>
+                  <View style={styles.menuIcon}>
+                    <MapPin size={20} color={COLORS.accent} />
+                  </View>
+                  <Text style={styles.menuLabel}>
+                    {mockUser.role === 'passenger' ? 'Book Ride' : 'Offer Ride'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </LinearGradient>
 
-            <TouchableOpacity style={styles.actionButton}>
-              <LinearGradient 
-                colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)']}
-                style={[styles.actionGradient, {
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.3)',
-                  shadowColor: '#000',
-                  shadowOffset: {width: 0, height: 2},
-                  shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                }]}
+            <LinearGradient
+              colors={['#ffffff', '#f8f9ff']}
+              style={styles.menuItem}
+            >
+              <TouchableOpacity 
+                style={styles.menuTouchable}
+                activeOpacity={0.9}
               >
-                <Clock size={24} color={COLORS.accent} />
-                <Text style={[styles.actionText, {color: COLORS.textPrimary}]}>Schedule</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <View style={styles.menuLeft}>
+                  <View style={styles.menuIcon}>
+                    <Clock size={20} color={COLORS.accent} />
+                  </View>
+                  <Text style={styles.menuLabel}>Schedule</Text>
+                </View>
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
 
           <View style={styles.section}>
@@ -119,14 +150,21 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>
                 {mockUser.role === 'passenger' ? 'Available Drivers' : 'Ride Requests'}
               </Text>
-              <View style={styles.aiIndicator}>
+              <LinearGradient
+                colors={['#ffffff', '#f8f9ff']}
+                style={styles.aiIndicator}
+              >
                 <Zap size={16} color={COLORS.accent} />
                 <Text style={styles.aiText}>AI Matched</Text>
-              </View>
+              </LinearGradient>
             </View>
 
             {mockMatches.map((match) => (
-              <View key={match.id} style={styles.matchCard}>
+              <LinearGradient
+                key={match.id}
+                colors={['#ffffff', '#f8f9ff', '#f3f6fe']}
+                style={styles.matchCard}
+              >
                 <View style={styles.matchHeader}>
                   <View>
                     <Text style={styles.matchName}>{match.driverName}</Text>
@@ -137,10 +175,13 @@ export default function HomeScreen() {
                       <Text style={styles.matchCar}>{match.carModel}</Text>
                     </View>
                   </View>
-                  <View style={styles.confidenceContainer}>
+                  <LinearGradient
+                    colors={['#ffffff', '#f8f9ff']}
+                    style={styles.confidenceContainer}
+                  >
                     <Text style={styles.confidenceText}>{match.confidence}%</Text>
                     <Text style={styles.confidenceLabel}>Match</Text>
-                  </View>
+                  </LinearGradient>
                 </View>
 
                 <View style={styles.matchInfo}>
@@ -153,48 +194,69 @@ export default function HomeScreen() {
                     <Text style={styles.infoText}>{match.distance}</Text>
                   </View>
                   
-                  <View style={styles.priceContainer}>
+                  <LinearGradient
+                    colors={['#ffffff', '#f8f9ff']}
+                    style={styles.priceContainer}
+                  >
                     <Text style={styles.priceText}>{match.price}</Text>
-                  </View>
+                  </LinearGradient>
                 </View>
 
-                <TouchableOpacity style={styles.requestButton}>
+                <TouchableOpacity 
+                  style={styles.requestButton}
+                  activeOpacity={0.9}
+                >
                   <Text style={styles.requestButtonText}>Request Ride</Text>
                 </TouchableOpacity>
-              </View>
+              </LinearGradient>
             ))}
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
-            <View style={styles.activityCard}>
-              <View style={styles.activityIcon}>
-                <MapPin size={20} color={COLORS.accent} />
-              </View>
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Trip to Airport completed</Text>
-                <Text style={styles.activitySubtitle}>Yesterday, 2:30 PM • ₹180</Text>
-              </View>
-            </View>
+            <LinearGradient
+              colors={['#ffffff', '#f8f9ff']}
+              style={styles.activityCard}
+            >
+              <TouchableOpacity 
+                style={styles.activityTouchable}
+                activeOpacity={0.9}
+              >
+                <View style={styles.activityIcon}>
+                  <MapPin size={20} color={COLORS.accent} />
+                </View>
+                <View style={styles.activityContent}>
+                  <Text style={styles.activityTitle}>Trip to Airport completed</Text>
+                  <Text style={styles.activitySubtitle}>Yesterday, 2:30 PM • ₹180</Text>
+                </View>
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.gradient[0],
+  },
   container: {
     flex: 1,
   },
-  safeArea: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: SIZES.sectionSpacing * 2,
   },
   profileSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: SIZES.safeAreaTop,
     paddingHorizontal: SIZES.horizontalPadding,
     paddingBottom: SIZES.sectionSpacing,
   },
@@ -203,48 +265,69 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   userName: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   statsContainer: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
     gap: 8,
   },
-  statItem: {
+  statCard: {
+    borderRadius: 14,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.glass,
-    padding: 8,
-    borderRadius: 12,
+    gap: 8,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 4,
   },
-  statText: {
+  statTextContainer: {
+    alignItems: 'flex-start',
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
     color: COLORS.textPrimary,
-    marginLeft: 6,
-    fontSize: 14,
-    fontWeight: '600',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
   quickActions: {
-    flexDirection: 'row',
     paddingHorizontal: SIZES.horizontalPadding,
     paddingVertical: SIZES.sectionSpacing,
-    gap: 16,
+    gap: 10,
   },
-  actionButton: {
-    flex: 1,
-    borderRadius: 16,
-    overflow: 'hidden',
+  menuItem: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 4,
   },
-  actionGradient: {
-    padding: 20,
+  menuTouchable: {
+    padding: 14,
+  },
+  menuLeft: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    flex: 1,
   },
-  actionText: {
-    color: 'white',
-    fontSize: 14,
+  menuIcon: {
+    marginRight: 12,
+  },
+  menuLabel: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
     fontWeight: '600',
   },
   section: {
@@ -259,13 +342,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   aiIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.glass,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
@@ -279,12 +361,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   matchCard: {
-    backgroundColor: COLORS.glass,
     borderRadius: 16,
     padding: 20,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 4,
   },
   matchHeader: {
     flexDirection: 'row',
@@ -294,7 +380,7 @@ const styles = StyleSheet.create({
   },
   matchName: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   matchDetails: {
@@ -318,7 +404,6 @@ const styles = StyleSheet.create({
   },
   confidenceContainer: {
     alignItems: 'center',
-    backgroundColor: 'white',
     padding: 8,
     borderRadius: 12,
     borderWidth: 1,
@@ -326,7 +411,7 @@ const styles = StyleSheet.create({
   },
   confidenceText: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: 'bold',
     color: COLORS.accent,
   },
   confidenceLabel: {
@@ -350,7 +435,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   priceContainer: {
-    backgroundColor: 'white',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -359,7 +443,7 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: 'bold',
     color: COLORS.accent,
   },
   requestButton: {
@@ -369,21 +453,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   requestButtonText: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   activityCard: {
-    backgroundColor: COLORS.glass,
-    borderRadius: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  activityTouchable: {
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
   },
   activityIcon: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.glass,
     borderRadius: 10,
     padding: 8,
     marginRight: 12,

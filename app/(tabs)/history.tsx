@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { MapPin, Clock, Star, Filter, Calendar, Navigation } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -92,6 +92,80 @@ export default function HistoryScreen() {
     }
   };
 
+  const renderTripCard = ({ item: trip }) => (
+    <LinearGradient
+      colors={['#ffffff', '#f8f9ff', '#f3f6fe']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={[styles.tripCard]}
+    >
+      {/* Trip Header */}
+      <View style={styles.tripHeader}>
+        <View style={styles.tripTypeContainer}>
+          <Text style={styles.tripType}>
+            {trip.type === 'passenger' ? 'Passenger' : 'Driver'}
+          </Text>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(trip.status) }]}>
+            <Text style={styles.statusText}>{getStatusText(trip.status)}</Text>
+          </View>
+        </View>
+        <View style={styles.confidenceContainer}>
+          <Text style={styles.confidenceText}>{trip.confidence}%</Text>
+          <Text style={styles.confidenceLabel}>AI Match</Text>
+        </View>
+      </View>
+
+      {/* Route */}
+      <View style={styles.routeContainer}>
+        <View style={styles.routePoint}>
+          <View style={styles.pickupDot} />
+          <Text style={styles.routeText}>{trip.from}</Text>
+        </View>
+        <View style={styles.routeLine} />
+        <View style={styles.routePoint}>
+          <MapPin size={12} color="#EF4444" />
+          <Text style={styles.routeText}>{trip.to}</Text>
+        </View>
+      </View>
+
+      {/* Trip Details */}
+      <View style={styles.tripDetails}>
+        <View style={styles.detailItem}>
+          <Calendar size={14} color="#6B7280" />
+          <Text style={styles.detailText}>{trip.date}</Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Clock size={14} color="#6B7280" />
+          <Text style={styles.detailText}>{trip.time}</Text>
+        </View>
+        <View style={styles.priceContainer}>
+          <Text style={styles.priceText}>{trip.price}</Text>
+        </View>
+      </View>
+
+      {/* Partner & Rating */}
+      <View style={styles.partnerContainer}>
+        <Text style={styles.partnerText}>
+          {trip.type === 'passenger' ? 'Driver: ' : 'Passenger: '}
+          <Text style={styles.partnerName}>
+            {trip.type === 'passenger' ? trip.driverName : trip.passengerName}
+          </Text>
+        </Text>
+        {trip.rating && (
+          <View style={styles.ratingContainer}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                size={12}
+                color={star <= trip.rating ? '#FCD34D' : '#E5E7EB'}
+              />
+            ))}
+          </View>
+        )}
+      </View>
+    </LinearGradient>
+  );
+
   return (
     <LinearGradient
       colors={['#E0F2FE', '#EDE9FE']}
@@ -107,7 +181,7 @@ export default function HistoryScreen() {
 
       {/* Filters */}
       <View style={styles.filtersContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+        <View style={styles.filters}>
           {[
             { key: 'all', label: 'All' },
             { key: 'completed', label: 'Completed' },
@@ -132,86 +206,17 @@ export default function HistoryScreen() {
               </Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
       </View>
 
       {/* Trip List */}
-      <ScrollView style={styles.tripList} showsVerticalScrollIndicator={false}>
-        {filteredTrips.map((trip) => (
-          <LinearGradient
-            key={trip.id}
-            colors={['#ffffff', '#f8f9ff', '#f3f6fe']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={[styles.tripCard]}
-          >
-            {/* Trip Header */}
-            <View style={styles.tripHeader}>
-              <View style={styles.tripTypeContainer}>
-                <Text style={styles.tripType}>
-                  {trip.type === 'passenger' ? 'Passenger' : 'Driver'}
-                </Text>
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(trip.status) }]}>
-                  <Text style={styles.statusText}>{getStatusText(trip.status)}</Text>
-                </View>
-              </View>
-              <View style={styles.confidenceContainer}>
-                <Text style={styles.confidenceText}>{trip.confidence}%</Text>
-                <Text style={styles.confidenceLabel}>AI Match</Text>
-              </View>
-            </View>
-
-            {/* Route */}
-            <View style={styles.routeContainer}>
-              <View style={styles.routePoint}>
-                <View style={styles.pickupDot} />
-                <Text style={styles.routeText}>{trip.from}</Text>
-              </View>
-              <View style={styles.routeLine} />
-              <View style={styles.routePoint}>
-                <MapPin size={12} color="#EF4444" />
-                <Text style={styles.routeText}>{trip.to}</Text>
-              </View>
-            </View>
-
-            {/* Trip Details */}
-            <View style={styles.tripDetails}>
-              <View style={styles.detailItem}>
-                <Calendar size={14} color="#6B7280" />
-                <Text style={styles.detailText}>{trip.date}</Text>
-              </View>
-              <View style={styles.detailItem}>
-                <Clock size={14} color="#6B7280" />
-                <Text style={styles.detailText}>{trip.time}</Text>
-              </View>
-              <View style={styles.priceContainer}>
-                <Text style={styles.priceText}>{trip.price}</Text>
-              </View>
-            </View>
-
-            {/* Partner & Rating */}
-            <View style={styles.partnerContainer}>
-              <Text style={styles.partnerText}>
-                {trip.type === 'passenger' ? 'Driver: ' : 'Passenger: '}
-                <Text style={styles.partnerName}>
-                  {trip.type === 'passenger' ? trip.driverName : trip.passengerName}
-                </Text>
-              </Text>
-              {trip.rating && (
-                <View style={styles.ratingContainer}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={12}
-                      color={star <= trip.rating ? '#FCD34D' : '#E5E7EB'}
-                    />
-                  ))}
-                </View>
-              )}
-            </View>
-          </LinearGradient>
-        ))}
-      </ScrollView>
+      <FlatList
+        data={filteredTrips}
+        renderItem={renderTripCard}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.tripList}
+        showsVerticalScrollIndicator={false}
+      />
     </LinearGradient>
   );
 }
@@ -239,6 +244,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   filters: {
+    flexDirection: 'row',
     paddingHorizontal: 24,
     gap: 12,
   },
@@ -263,7 +269,6 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   tripList: {
-    flex: 1,
     paddingHorizontal: 24,
   },
   tripCard: {

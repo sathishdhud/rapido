@@ -4,7 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 
 export default function RootLayout() {
+
   useFrameworkReady();
+
 
   return (
     <>
@@ -14,8 +16,21 @@ export default function RootLayout() {
         <Stack.Screen name="role-selection" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" />
+       
+
+
       </Stack>
       <StatusBar style="auto" />
     </>
   );
 }
+
+
+
+
+
+
+
+
+
+

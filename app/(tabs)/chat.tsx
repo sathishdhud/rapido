@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { MessageCircle, Send, Phone, MoveVertical as MoreVertical, Star } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Mock chat data
 const mockChats = [
@@ -13,6 +14,7 @@ const mockChats = [
     avatar: '👩‍💼',
     status: 'active',
     rating: 4.9,
+    confidence: 96,
   },
   {
     id: '2',
@@ -23,6 +25,7 @@ const mockChats = [
     avatar: '👨‍💻',
     status: 'completed',
     rating: 4.7,
+    confidence: 89,
   },
 ];
 
@@ -60,7 +63,12 @@ export default function ChatScreen() {
 
   if (selectedChat) {
     return (
-      <View style={styles.container}>
+      <LinearGradient
+        colors={['#E0F2FE', '#EDE9FE']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.container}
+      >
         {/* Chat Header */}
         <View style={styles.chatHeader}>
           <TouchableOpacity
@@ -71,9 +79,15 @@ export default function ChatScreen() {
           </TouchableOpacity>
           <View style={styles.chatHeaderInfo}>
             <Text style={styles.chatHeaderName}>Sarah Wilson</Text>
-            <View style={styles.chatHeaderRating}>
-              <Star size={12} color="#FCD34D" />
-              <Text style={styles.ratingText}>4.9</Text>
+            <View style={styles.chatHeaderMeta}>
+              <View style={styles.chatHeaderRating}>
+                <Star size={12} color="#FCD34D" />
+                <Text style={styles.ratingText}>4.9</Text>
+              </View>
+              <View style={styles.confidenceContainer}>
+                <Text style={styles.confidenceText}>96%</Text>
+                <Text style={styles.confidenceLabel}>AI Match</Text>
+              </View>
             </View>
           </View>
           <View style={styles.chatHeaderActions}>
@@ -89,8 +103,11 @@ export default function ChatScreen() {
         {/* Messages */}
         <ScrollView style={styles.messagesContainer} showsVerticalScrollIndicator={false}>
           {mockMessages.map((message) => (
-            <View
+            <LinearGradient
               key={message.id}
+              colors={message.sender === 'me' ? ['#3B82F6', '#2563EB'] : ['#ffffff', '#f8f9ff']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={[
                 styles.messageCard,
                 message.sender === 'me' ? styles.myMessage : styles.otherMessage,
@@ -108,7 +125,7 @@ export default function ChatScreen() {
               ]}>
                 {message.time}
               </Text>
-            </View>
+            </LinearGradient>
           ))}
         </ScrollView>
 
@@ -122,15 +139,27 @@ export default function ChatScreen() {
             multiline
           />
           <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <Send size={20} color="white" />
+            <LinearGradient
+              colors={['#3B82F6', '#2563EB']}
+              style={styles.sendButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Send size={20} color="white" />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#E0F2FE', '#EDE9FE']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.container}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Messages</Text>
@@ -142,37 +171,45 @@ export default function ChatScreen() {
         {mockChats.map((chat) => (
           <TouchableOpacity
             key={chat.id}
-            style={styles.chatItem}
             onPress={() => setSelectedChat(chat)}
+            style={styles.chatItem}
           >
-            <View style={styles.avatarContainer}>
-              <Text style={styles.avatar}>{chat.avatar}</Text>
-              <View style={[
-                styles.statusIndicator,
-                { backgroundColor: chat.status === 'active' ? '#10B981' : '#6B7280' },
-              ]} />
-            </View>
-
-            <View style={styles.chatContent}>
-              <View style={styles.chatHeader}>
-                <Text style={styles.chatName}>{chat.name}</Text>
-                <View style={styles.chatMeta}>
-                  <Star size={12} color="#FCD34D" />
-                  <Text style={styles.chatRating}>{chat.rating}</Text>
-                </View>
+            <View style={styles.chatItemContent}>
+              <View style={styles.avatarContainer}>
+                <Text style={styles.avatar}>{chat.avatar}</Text>
+                <View style={[
+                  styles.statusIndicator,
+                  { backgroundColor: chat.status === 'active' ? '#10B981' : '#6B7280' },
+                ]} />
               </View>
-              <Text style={styles.lastMessage} numberOfLines={1}>
-                {chat.lastMessage}
-              </Text>
-            </View>
 
-            <View style={styles.chatRight}>
-              <Text style={styles.chatTime}>{chat.time}</Text>
-              {chat.unread > 0 && (
-                <View style={styles.unreadBadge}>
-                  <Text style={styles.unreadText}>{chat.unread}</Text>
+              <View style={styles.chatContent}>
+                <View style={styles.chatHeader}>
+                  <Text style={styles.chatName}>{chat.name}</Text>
+                  <View style={styles.chatMeta}>
+                    <View style={styles.ratingContainer}>
+                      <Star size={12} color="#FCD34D" />
+                      <Text style={styles.chatRating}>{chat.rating}</Text>
+                    </View>
+                    <View style={styles.confidenceContainer}>
+                      <Text style={styles.confidenceText}>{chat.confidence}%</Text>
+                      <Text style={styles.confidenceLabel}>AI Match</Text>
+                    </View>
+                  </View>
                 </View>
-              )}
+                <Text style={styles.lastMessage} numberOfLines={1}>
+                  {chat.lastMessage}
+                </Text>
+              </View>
+
+              <View style={styles.chatRight}>
+                <Text style={styles.chatTime}>{chat.time}</Text>
+                {chat.unread > 0 && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadText}>{chat.unread}</Text>
+                  </View>
+                )}
+              </View>
             </View>
           </TouchableOpacity>
         ))}
@@ -188,14 +225,13 @@ export default function ChatScreen() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   header: {
     paddingTop: 60,
@@ -217,17 +253,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   chatItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
-    padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  chatItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
   },
   avatarContainer: {
     position: 'relative',
@@ -269,12 +307,29 @@ const styles = StyleSheet.create({
   chatMeta: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 2,
   },
   chatRating: {
     fontSize: 12,
     color: '#6B7280',
-    marginLeft: 2,
+  },
+  confidenceContainer: {
+    alignItems: 'center',
+  },
+  confidenceText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#10B981',
+  },
+  confidenceLabel: {
+    fontSize: 8,
+    color: '#6B7280',
+    textTransform: 'uppercase',
   },
   lastMessage: {
     fontSize: 14,
@@ -320,16 +375,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 32,
   },
-  // Chat Screen Styles
   chatHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: 'rgba(229, 231, 235, 0.5)',
   },
   backButton: {
     marginRight: 16,
@@ -346,10 +400,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1F2937',
   },
+  chatHeaderMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 2,
+  },
   chatHeaderRating: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
   },
   ratingText: {
     fontSize: 12,
@@ -375,12 +434,10 @@ const styles = StyleSheet.create({
   },
   myMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#3B82F6',
     borderBottomRightRadius: 4,
   },
   otherMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: 'white',
     borderBottomLeftRadius: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -412,9 +469,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: 'rgba(229, 231, 235, 0.5)',
     gap: 12,
   },
   messageInput: {
@@ -426,10 +483,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     maxHeight: 100,
+    backgroundColor: 'white',
   },
   sendButton: {
-    backgroundColor: '#3B82F6',
     borderRadius: 20,
+    overflow: 'hidden',
+  },
+  sendButtonGradient: {
     padding: 12,
   },
 });

@@ -1,14 +1,19 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
+    "name": "RapidoSync",
     "slug": "bolt-expo-nativewind",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "icon": "assets/images/icon.png",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.sathishdhud.boltexponativewind",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
@@ -31,15 +36,6 @@
     "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/00576d0f-a888-4038-aafd-42df7a384148"
-    },
-    "android": {
-      "package": "com.sathishdhud.boltexponativewind",
-      "versionCode": 1
-    }
-  },
-  "expo.doctor": {
-    "reactNativeDirectoryCheck": {
-      "listUnknownPackages": false
     }
   }
 }
